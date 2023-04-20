@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Strona główna</title>
+</head>
+<body>
+<button onclick="make_transfer()">Make transfer</button>
+
+{% for transfer in transfers: %}
+<div class="transfer">
+    <b>{{transfer[0]}}</b><br>
+    {{transfer[1]}} {{transfer[2]}}<br>
+</div><br>
+{% endfor %}
+
+
+
+<script>
+    function make_transfer() {
+      fetch('/transfer', { method: 'GET'})
+    }
+</script>
+</body>
+</html>
