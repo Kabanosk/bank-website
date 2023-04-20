@@ -1,0 +1,5 @@
+fastapi
+psycopg2
+jinja2
+python-multipart
+fastapi-session
