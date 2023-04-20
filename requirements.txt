@@ -2,4 +2,9 @@ fastapi
 psycopg2
 jinja2
 python-multipart
+<<<<<<< HEAD
 starlette
+=======
+starlette
+itsdangerous
+>>>>>>> 672bc1f0777805a393b63b5af86482596761aae3

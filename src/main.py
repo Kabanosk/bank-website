@@ -1,7 +1,8 @@
-from model.db import add_user_to_database, get_user, get_all_transfers_from, get_all_transfers_to
+from model.db import add_user_to_database, get_user, get_all_transfers_from, get_all_transfers_to, get_user_id, \
+    get_user_id_by_login, add_transfer
 from model.user import User
 
-from fastapi import FastAPI, Request, Form, status
+from fastapi import FastAPI, Request, Form, status, Query
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
@@ -12,12 +13,6 @@ import uvicorn
 app = FastAPI()
 templates = Jinja2Templates(directory="src/templates")
 app.add_middleware(SessionMiddleware, secret_key="test")
-
-# CRUD -> Create read update delete
-# GET       Read
-# POST      create
-# DELETE    delete
-# PUT       update
 
 
 @app.get("/")
@@ -64,6 +59,33 @@ def login_user(request: Request, login: str = Form(""), password: str = Form("")
 @app.get("/forgot-password")
 def forgot_password_page(request: Request):
     pass  # TODO: forgot password page
+
+
+@app.get("/transfer")
+def get_transfer_page(request: Request):
+    return templates.TemplateResponse("transfer.html", {"request": request})
+
+
+@app.post("/approve-transfer")
+def get_approve_transfer_page(request: Request, login: str = Form(""), amount: int = Form("")):
+    transfer_data = {
+        "login": login,
+        "amount": amount
+    }
+    request.session["transfer_data"] = transfer_data
+    return templates.TemplateResponse("approve-transfer.html",
+                                      {"request": request, "login": login, "amount": amount})
+
+
+@app.post("/transfer")
+def add_transfer_(request: Request):
+    transfer_data = request.session.get("transfer_data")
+    user = request.session.get("user")
+    from_id = get_user_id(user["email"])
+    to_id = get_user_id_by_login(transfer_data["login"])
+    amount = transfer_data["amount"]
+    add_transfer(from_id, to_id, amount)
+    return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@
     <title>Strona główna</title>
 </head>
 <body>
-<button onclick="make_transfer()">Make transfer</button>
+<a href="/transfer">Make transfer</a>
 
 {% for transfer in transfers: %}
 <div class="transfer">
@@ -14,12 +14,5 @@
 </div><br>
 {% endfor %}
 
-
-
-<script>
-    function make_transfer() {
-      fetch('/transfer', { method: 'GET'})
-    }
-</script>
 </body>
 </html>
