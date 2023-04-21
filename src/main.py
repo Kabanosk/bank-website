@@ -12,17 +12,43 @@ templates = Jinja2Templates(directory="src/templates")
 app.add_middleware(SessionMiddleware, secret_key="test")
 
 
+def comp_less(item1, item2):
+    return item1[1] < item2[1]
+
+
+def make_transfers(t_from: list, t_to: list):
+    i, j = 0, 0
+    n, m = len(t_from), len(t_to)
+    res = []
+    while i < n and j < m:
+        if comp_less(t_from[i], t_to[j]):
+            res.append(t_from[i] + (1, ))
+            i += 1
+        else:
+            res.append(t_to[j] + (0, ))
+            j += 1
+    if i != n:
+        for x in t_from[i+1:]:
+            res.append(x)
+    if j != m:
+        for x in t_to[j+1:]:
+            res.append(x)
+    print(res)
+    return res
+
+
 @app.get("/")
 def get_main_page(request: Request):
     user = request.session.get("user")
     if user is None:
         return RedirectResponse("/login")
+    user = User.from_dict(user)
+    transfers = make_transfers(get_all_transfers_from(user), get_all_transfers_to(user))
     return templates.TemplateResponse(
         "main.html",
         {
             "request": request,
-            "transfers_from": get_all_transfers_from(User.from_dict(user)),
-            "transfers_to": get_all_transfers_to(User.from_dict(user))
+            "transfers": transfers
         }
     )
 

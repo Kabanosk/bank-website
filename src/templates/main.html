@@ -10,7 +10,13 @@
 {% for transfer in transfers: %}
 <div class="transfer">
     <b>{{transfer[0]}}</b><br>
-    {{transfer[1]}} {{transfer[2]}}<br>
+    {{transfer[1]}}
+    {% if transfer[3]: %}
+        <span style="color: green">{{transfer[2]}}</span>
+    {% else: %}
+        <span style="color: red">{{transfer[2]}}</span>
+    {% endif %}
+    <br>
 </div><br>
 {% endfor %}
 
