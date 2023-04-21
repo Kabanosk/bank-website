@@ -3,6 +3,8 @@ from model.db import add_user_to_database, get_user, get_all_transfers_from, get
 from model.user import User
 from src.validation import valid_email, valid_password
 
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 from fastapi import FastAPI, Request, Form, status
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -82,8 +84,17 @@ def get_login_page(request: Request):
 
 @app.post("/login")
 def login_user(request: Request, login: str = Form(""), password: str = Form("")):
-    user_data = get_user(login, password)
+    user_data = get_user(login)
+    if not user_data:
+        return {"message": "User not found."}
     user = User(*user_data)
+
+    ph = PasswordHasher()
+    h_pass = user.password
+    try:
+        ph.verify(h_pass, password)
+    except VerifyMismatchError:
+        return {"message": "Bad password"}
 
     if not user_exists(user):
         return {"message": "User doesn't exist."}

@@ -1,14 +1,15 @@
 from model.user import User
 
+from argon2 import PasswordHasher
 import psycopg2
 
 postgres_connection = psycopg2.connect("dbname=bank_website user=postgres password='test'")
 cursor = postgres_connection.cursor()
 
 
-def get_user(login, password):
-    query = f"SELECT login, email, password FROM \"user\" WHERE login = %s AND password = %s"
-    cursor.execute(query, (login, password))
+def get_user(login):
+    query = f"SELECT login, email, password FROM \"user\" WHERE login = %s"
+    cursor.execute(query, (login, ))
     res = cursor.fetchone()
     return res
 
@@ -63,9 +64,11 @@ def user_exists(user: User):
 def add_user_to_database(user: User):
     if not (user.login and user.email and user.password):
         return {"error": "some of fields are NULL"}
+    ph = PasswordHasher()
+    h_pass = ph.hash(user.password)
 
     query = f"INSERT INTO \"user\" (login, email, password)  VALUES (%s, %s, %s)"
-    cursor.execute(query, (user.login, user.email, user.password))
+    cursor.execute(query, (user.login, user.email, h_pass))
     postgres_connection.commit()
 
 
