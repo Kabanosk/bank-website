@@ -1,8 +1,8 @@
-from model.db import add_user_to_database, get_user, get_all_transfers_from, get_all_transfers_to, get_user_id, \
-    get_user_id_by_login, add_transfer
+from model.db import add_user_to_database, get_user, get_all_transfers_from, get_all_transfers_to, get_user_id_by_email, \
+    get_user_id_by_login, add_transfer, user_exists, update_user_balance, get_user_data_by_id
 from model.user import User
 
-from fastapi import FastAPI, Request, Form, status, Query
+from fastapi import FastAPI, Request, Form, status
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
@@ -35,6 +35,8 @@ def get_register_page(request: Request):
 @app.post("/register")
 def register_user(request: Request, login: str = Form(""), email: str = Form(""), password: str = Form("")):
     new_user = User(login, email, password)
+    if user_exists(new_user):
+        return {"message": "User exists."}
     add_user_to_database(new_user)
     request.session["user"] = new_user.to_dict()
     return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
@@ -49,6 +51,8 @@ def get_login_page(request: Request):
 def login_user(request: Request, login: str = Form(""), password: str = Form("")):
     user_data = get_user(login, password)
     user = User(*user_data)
+    if not user_exists(user):
+        return {"message": "User don't exist."}
     request.session["user"] = user.to_dict()
     return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
 
@@ -78,14 +82,15 @@ def get_approve_transfer_page(request: Request, login: str = Form(""), amount: i
 def add_transfer_(request: Request):
     transfer_data = request.session.get("transfer_data")
     user = request.session.get("user")
-    from_id = get_user_id(user["email"])
+    from_id = get_user_id_by_email(user["email"])
     to_id = get_user_id_by_login(transfer_data["login"])
     amount = transfer_data["amount"]
+
+    user2 = get_user_data_by_id(to_id)
+    user = User.from_dict(user)
+    to_user = User(user2[0], user2[1], user2[2])
+
     add_transfer(from_id, to_id, amount)
+    update_user_balance(user, -amount)
+    update_user_balance(to_user, amount)
     return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
-
-
-
-
-
-
