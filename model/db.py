@@ -81,7 +81,7 @@ def get_all_transfers_from(user: User):
 
 def get_all_transfers_to(user: User):
     query = 'SELECT login, date, amount FROM transfer ' \
-            'JOIN "user" u ON to_id = u.id WHERE to_id = %s ORDER BY date DESC'
+            'JOIN "user" u ON from_id = u.id WHERE to_id = %s ORDER BY date DESC'
     cursor.execute(query, (get_user_id_by_email(user.email),))
     return cursor.fetchall()
 

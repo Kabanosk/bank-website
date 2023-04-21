@@ -9,7 +9,7 @@
 <a href="/logout">Logout</a>
 {% for transfer in transfers: %}
 <div class="transfer">
-    <b>{{transfer[0]}}</b><br>
+    <b>From: {{transfer[0]}}</b><br>
     {{transfer[1]}}
     {% if transfer[3]: %}
         <span style="color: red">{{transfer[2]}}</span>
