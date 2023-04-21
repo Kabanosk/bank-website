@@ -1,6 +1,7 @@
 from model.db import add_user_to_database, get_user, get_all_transfers_from, get_all_transfers_to, get_user_id_by_email, \
-    get_user_id_by_login, add_transfer, user_exists, update_user_balance, get_user_data_by_id
+    get_user_id_by_login, add_transfer, user_exists, update_user_balance, get_user_data_by_id, get_user_balance
 from model.user import User
+from src.validation import valid_email, valid_password
 
 from fastapi import FastAPI, Request, Form, status
 from fastapi.responses import RedirectResponse
@@ -28,12 +29,11 @@ def make_transfers(t_from: list, t_to: list):
             res.append(t_to[j] + (0, ))
             j += 1
     if i != n:
-        for x in t_from[i+1:]:
-            res.append(x)
+        for x in t_from[i:]:
+            res.append(x + (1, ))
     if j != m:
-        for x in t_to[j+1:]:
-            res.append(x)
-    print(res)
+        for x in t_to[j:]:
+            res.append(x + (0, ))
     return res
 
 
@@ -61,8 +61,15 @@ def get_register_page(request: Request):
 @app.post("/register")
 def register_user(request: Request, login: str = Form(""), email: str = Form(""), password: str = Form("")):
     new_user = User(login, email, password)
+
+    if not valid_email(email):
+        return {"message": "Email not valid."}
+    if not valid_password(password):
+        return {"message": "Password not valid."}
+
     if user_exists(new_user):
         return {"message": "User exists."}
+
     add_user_to_database(new_user)
     request.session["user"] = new_user.to_dict()
     return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
@@ -77,10 +84,18 @@ def get_login_page(request: Request):
 def login_user(request: Request, login: str = Form(""), password: str = Form("")):
     user_data = get_user(login, password)
     user = User(*user_data)
+
     if not user_exists(user):
-        return {"message": "User don't exist."}
+        return {"message": "User doesn't exist."}
+
     request.session["user"] = user.to_dict()
     return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@app.get("/logout")
+def logout(request: Request):
+    request.session.pop("user")
+    return RedirectResponse("/")
 
 
 @app.get("/forgot-password")
@@ -99,6 +114,14 @@ def get_approve_transfer_page(request: Request, login: str = Form(""), amount: i
         "login": login,
         "amount": amount
     }
+
+    user = User.from_dict(request.session.get("user"))
+    user_balance = get_user_balance(user)
+    if user_balance < amount:
+        return {"message": "Not enough many in your balance."}
+    if not user_exists(user):
+        return {"message": "User doesn't exist."}
+
     request.session["transfer_data"] = transfer_data
     return templates.TemplateResponse("approve-transfer.html",
                                       {"request": request, "login": login, "amount": amount})
@@ -114,6 +137,8 @@ def add_transfer_(request: Request):
 
     user2 = get_user_data_by_id(to_id)
     user = User.from_dict(user)
+    if not user2:
+        return {"message": "User doesn't exist."}
     to_user = User(user2[0], user2[1], user2[2])
 
     add_transfer(from_id, to_id, amount)
