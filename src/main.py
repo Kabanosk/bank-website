@@ -16,7 +16,7 @@ app.add_middleware(SessionMiddleware, secret_key="test")
 
 
 def comp_less(item1, item2):
-    return item1[1] < item2[1]
+    return item1[3] < item2[3]
 
 
 def make_transfers(t_from: list, t_to: list):
@@ -120,9 +120,11 @@ def get_transfer_page(request: Request):
 
 
 @app.post("/approve-transfer")
-def get_approve_transfer_page(request: Request, login: str = Form(""), amount: int = Form("")):
+def get_approve_transfer_page(request: Request, login: str = Form(""), title: str = Form(""), description: str = Form(""), amount: int = Form("")):
     transfer_data = {
         "login": login,
+        "title": title,
+        "description": description,
         "amount": amount
     }
 
@@ -134,8 +136,15 @@ def get_approve_transfer_page(request: Request, login: str = Form(""), amount: i
         return {"message": "User doesn't exist."}
 
     request.session["transfer_data"] = transfer_data
-    return templates.TemplateResponse("approve-transfer.html",
-                                      {"request": request, "login": login, "amount": amount})
+    return templates.TemplateResponse(
+        "approve-transfer.html",
+        {
+            "request": request,
+            "login": login,
+            "title": title,
+            "description": description,
+            "amount": amount
+        })
 
 
 @app.post("/transfer")
@@ -144,6 +153,8 @@ def add_transfer_(request: Request):
     user = request.session.get("user")
     from_id = get_user_id_by_email(user["email"])
     to_id = get_user_id_by_login(transfer_data["login"])
+    title = transfer_data["title"]
+    desc = transfer_data["description"]
     amount = transfer_data["amount"]
 
     user2 = get_user_data_by_id(to_id)
@@ -152,7 +163,7 @@ def add_transfer_(request: Request):
         return {"message": "User doesn't exist."}
     to_user = User(user2[0], user2[1], user2[2])
 
-    add_transfer(from_id, to_id, amount)
+    add_transfer(from_id, to_id, title, desc, amount)
     update_user_balance(user, -amount)
     update_user_balance(to_user, amount)
     return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)

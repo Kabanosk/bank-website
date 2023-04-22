@@ -73,22 +73,22 @@ def add_user_to_database(user: User):
 
 
 def get_all_transfers_from(user: User):
-    query = 'SELECT login, date, amount FROM transfer ' \
+    query = 'SELECT login, title, description, date, amount FROM transfer ' \
             'JOIN "user" u ON to_id = u.id WHERE from_id = %s ORDER BY date DESC'
     cursor.execute(query, (get_user_id_by_email(user.email),))
     return cursor.fetchall()
 
 
 def get_all_transfers_to(user: User):
-    query = 'SELECT login, date, amount FROM transfer ' \
+    query = 'SELECT login, title, description, date, amount FROM transfer ' \
             'JOIN "user" u ON from_id = u.id WHERE to_id = %s ORDER BY date DESC'
     cursor.execute(query, (get_user_id_by_email(user.email),))
     return cursor.fetchall()
 
 
-def add_transfer(from_id: int, to_id: int, amount: int):
-    query = "INSERT INTO transfer (from_id, to_id, date, amount) VALUES (%s, %s, now(), %s)"
-    cursor.execute(query, (from_id, to_id, amount))
+def add_transfer(from_id: int, to_id: int, title: str, description: str, amount: int):
+    query = "INSERT INTO transfer (from_id, to_id, title, description, date, amount) VALUES (%s, %s, %s, %s, now(), %s)"
+    cursor.execute(query, (from_id, to_id, title, description, amount))
     postgres_connection.commit()
 
 
