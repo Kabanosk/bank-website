@@ -5,12 +5,25 @@
     <title>Strona główna</title>
 </head>
 <body>
-<a href="/transfer">Make transfer</a>
-
+<a href="/transfer">Make transfer</a><br>
+<a href="/logout">Logout</a><br><br>
 {% for transfer in transfers: %}
 <div class="transfer">
+    {% if transfer[5]: %}
+        To:
+    {% else: %}
+        From:
+    {% endif %}
     <b>{{transfer[0]}}</b><br>
-    {{transfer[1]}} {{transfer[2]}}<br>
+    <b>{{transfer[1]}}</b><br>
+    {{transfer[2]}}<br>
+    {{transfer[3]}}
+    {% if transfer[5]: %}
+        <span style="color: red">{{transfer[4]}}</span>
+    {% else: %}
+        <span style="color: green">{{transfer[4]}}</span>
+    {% endif %}
+    <br>
 </div><br>
 {% endfor %}
 
