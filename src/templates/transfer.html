@@ -1,24 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Make transfer</title>
+
+	<link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-<form method="post" action="/approve-transfer">
-  <label>Account:
-    <input type="text" name="login">
-  </label><br>
-  <label>Title:
-    <input type="text" name="title">
-  </label><br>
-  <label>Description:
-    <input type="text" name="description">
-  </label><br>
-  <label>Amount:
-    <input type="number" name="amount">
-  </label><br>
-  <input type="submit">
-</form>
+	<div class="container">
+		<i class="size3" style="--clr:#00ff0a;"></i>
+		<i class="size3" style="--clr:#ff0057;"></i>
+		<i class="size3" style="--clr:#fffc44;"></i>
+
+		<form method="post" class="login" action="/approve-transfer">
+			<div class="inputBx">
+				<input type="text" placeholder="Login" name="login">
+			</div>
+			<div class="inputBx">
+				<input type="text" placeholder="Title" name="title">
+			</div>
+			<div class="inputBx">
+			    <input type="text" placeholder="Description" name="description">
+			</div>
+			<div class="inputBx">
+			    <input type="number" placeholder="Amount" name="amount">
+			</div>
+			<div class="inputBx">
+				<input type="submit" value="Submit">
+			</div>
+		</form>
+	</div>
 </body>
 </html>

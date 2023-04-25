@@ -1,16 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Approve transfer</title>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Approve transfer</title>
+
+	<link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-Account: {{login}}<br>
-{{title}}<br>
-{{description}}<br>
-Amount: {{amount}}
-<form method="post" action="/transfer">
-    <input type="submit">
-</form>
+	<div class="container">
+		<i class="size2" style="--clr:#00ff0a;"></i>
+		<i class="size2" style="--clr:#ff0057;"></i>
+		<i class="size2" style="--clr:#fffc44;"></i>
+
+		<form method="post" action="/transfer">
+		<div class="inputBx">
+			Account: {{login}}<br>
+		</div>
+
+		<div class="inputBx">
+			{{title}}<br>
+		</div>
+
+		<div class="inputBx">
+			{{description}}<br>
+		</div>
+
+		<div class="inputBx">
+			Amount: {{amount}}
+		</div>
+
+		<div class="inputBx">
+			<input type="submit">
+		</div>
+		</form>
+	</div>
 </body>
 </html>
