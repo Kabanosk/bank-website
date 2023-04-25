@@ -1,14 +1,21 @@
+import random
+
 from model.db import add_user_to_database, get_user, get_all_transfers_from, get_all_transfers_to, get_user_id_by_email, \
-    get_user_id_by_login, add_transfer, user_exists, update_user_balance, get_user_data_by_id, get_user_balance
+    get_user_id_by_login, add_transfer, user_exists, update_user_balance, get_user_data_by_id, get_user_balance, \
+    update_password
 from model.user import User
 from src.validation import valid_email, valid_password
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
-from fastapi import FastAPI, Request, Form, status
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
+from fastapi import FastAPI, Request, HTTPException, Form, status
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
+import smtplib
 
 app = FastAPI()
 templates = Jinja2Templates(directory="src/templates")
@@ -111,7 +118,64 @@ def logout(request: Request):
 
 @app.get("/forgot-password")
 def forgot_password_page(request: Request):
-    pass  # TODO: forgot password page
+    return templates.TemplateResponse("forgot-password.html", {"request": request})
+
+
+@app.post("/forgot-password")
+def forgot_password(request: Request, email: str = Form("")):
+    try:
+        u_id = get_user_id_by_email(email)
+        if not u_id:
+            raise HTTPException(status_code=404, detail="User not found")
+        user = User(*get_user_data_by_id(u_id))
+
+        reset_token = "".join([str(random.randint(0, 9)) for _ in range(10)])
+        request.session["token"] = reset_token
+        request.session["email"] = email
+
+        smtp_server = "smtp.gmail.com"
+        smtp_port = 465
+        smtp_username = "bank.moj.ulubiony@gmail.com"
+        smtp_password = "mgcuexptvlwoczdk"
+
+        body = f"Subject: Password Reset Request\n\n" \
+               f"Hi {user.login},\n\n" \
+               f"We received a request to reset the password for your account. This is your special code: " \
+               f"\n\n{reset_token}\nIf you did not request a password reset, please ignore this " \
+               f"email.\n\nThanks,\nThe MojWspanialyBank Team"
+
+        with smtplib.SMTP_SSL(smtp_server, smtp_port) as server:
+            server.login(smtp_username, smtp_password)
+            server.sendmail(smtp_username, user.email, body)
+
+        return templates.TemplateResponse("approve-password.html", {"request": request})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/password-code")
+def password_code(request: Request, token: str = Form("")):
+    good_token = request.session.pop("token")
+    if token == good_token:
+        return RedirectResponse("/update-password", status_code=status.HTTP_303_SEE_OTHER)
+    return {"message": "Bad token."}
+
+
+@app.get("/update-password")
+def update_password_page(request: Request):
+    return templates.TemplateResponse("update-password.html", {"request": request})
+
+
+@app.post("/update-password")
+def update_password_(request: Request, new_password: str = Form("")):
+    email = request.session.pop("email")
+    update_password(email, new_password)
+
+    print(request.session)
+    u_id = get_user_id_by_email(email)
+    user = User(*get_user_data_by_id(u_id))
+    request.session["user"] = user.to_dict()
+    return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.get("/transfer")

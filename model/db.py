@@ -67,8 +67,17 @@ def add_user_to_database(user: User):
     ph = PasswordHasher()
     h_pass = ph.hash(user.password)
 
-    query = f"INSERT INTO \"user\" (login, email, password)  VALUES (%s, %s, %s)"
+    query = 'INSERT INTO "user" (login, email, password)  VALUES (%s, %s, %s)'
     cursor.execute(query, (user.login, user.email, h_pass))
+    postgres_connection.commit()
+
+
+def update_password(email: str, new_password: str):
+    ph = PasswordHasher()
+    h_pass = ph.hash(new_password)
+
+    query = 'UPDATE "user" SET password = %s WHERE email = %s'
+    cursor.execute(query, (h_pass, email))
     postgres_connection.commit()
 
 
