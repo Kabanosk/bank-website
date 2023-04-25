@@ -14,26 +14,27 @@
 		<i class="size2" style="--clr:#ff0057;"></i>
 		<i class="size2" style="--clr:#fffc44;"></i>
 
-		<form method="post" action="/transfer">
-		<div class="inputBx">
-			Account: {{login}}<br>
-		</div>
+		<form method="post" class="login" action="/transfer">
+			<!-- TODO: zrobic ladne bloczki -->
+			<div class="inputBx">
+				<p>Account: {{login}}<br></p>
+			</div>
 
-		<div class="inputBx">
-			{{title}}<br>
-		</div>
+			<div class="inputBx">
+				<p>{{title}}<br></p>
+			</div>
 
-		<div class="inputBx">
-			{{description}}<br>
-		</div>
+			<div class="inputBx">
+				<p>{{description}}<br></p>
+			</div>
 
-		<div class="inputBx">
-			Amount: {{amount}}
-		</div>
+			<div class="inputBx">
+				<p>Amount: {{amount}}</p>
+			</div>
 
-		<div class="inputBx">
-			<input type="submit">
-		</div>
+			<div class="inputBx">
+				<input type="submit" value="Submit">
+			</div>
 		</form>
 	</div>
 </body>

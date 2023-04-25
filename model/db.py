@@ -75,14 +75,14 @@ def add_user_to_database(user: User):
 
 def get_all_transfers_from(user: User):
 	query = 'SELECT login, title, description, date, amount FROM transfer ' \
-			'JOIN "user" u ON to_id = u.id WHERE from_id = %s ORDER BY date DESC'
+			'JOIN "user" u ON to_id = u.id WHERE from_id = %s ORDER BY date DESC LIMIT 5'
 	cursor.execute(query, (get_user_id_by_email(user.email),))
 	return cursor.fetchall()
 
 
 def get_all_transfers_to(user: User):
 	query = 'SELECT login, title, description, date, amount FROM transfer ' \
-			'JOIN "user" u ON from_id = u.id WHERE to_id = %s ORDER BY date DESC'
+			'JOIN "user" u ON from_id = u.id WHERE to_id = %s ORDER BY date DESC LIMIT 5'
 	cursor.execute(query, (get_user_id_by_email(user.email),))
 	return cursor.fetchall()
 
