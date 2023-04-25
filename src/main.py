@@ -1,16 +1,11 @@
 import random
 
-from model.db import add_user_to_database, get_user, get_all_transfers_from, get_all_transfers_to, get_user_id_by_email, \
-    get_user_id_by_login, add_transfer, user_exists, update_user_balance, get_user_data_by_id, get_user_balance, \
-    update_password
+from model.db import *
 from model.user import User
 from src.validation import valid_email, valid_password
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.application import MIMEApplication
 from fastapi import FastAPI, Request, HTTPException, Form, status
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -123,6 +118,8 @@ def forgot_password_page(request: Request):
 
 @app.post("/forgot-password")
 def forgot_password(request: Request, email: str = Form("")):
+    if not valid_email(email):
+        return {"message": "Email not valid."}
     try:
         u_id = get_user_id_by_email(email)
         if not u_id:
@@ -185,7 +182,13 @@ def get_transfer_page(request: Request):
 
 
 @app.post("/approve-transfer")
-def get_approve_transfer_page(request: Request, login: str = Form(""), title: str = Form(""), description: str = Form(""), amount: int = Form("")):
+def get_approve_transfer_page(
+        request: Request,
+        login: str = Form(""),
+        title: str = Form(""),
+        description: str = Form(""),
+        amount: int = Form(0)
+):
     transfer_data = {
         "login": login,
         "title": title,
