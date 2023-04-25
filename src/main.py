@@ -169,9 +169,10 @@ def update_password_page(request: Request):
 @app.post("/update-password")
 def update_password_(request: Request, new_password: str = Form("")):
     email = request.session.pop("email")
+    if not valid_password(new_password):
+        return {"message": "Password not valid."}
     update_password(email, new_password)
 
-    print(request.session)
     u_id = get_user_id_by_email(email)
     user = User(*get_user_data_by_id(u_id))
     request.session["user"] = user.to_dict()
@@ -191,6 +192,9 @@ def get_approve_transfer_page(request: Request, login: str = Form(""), title: st
         "description": description,
         "amount": amount
     }
+
+    if amount <= 0:
+        return {"message": "Transaction amount must be positive"}
 
     user = User.from_dict(request.session.get("user"))
     user_balance = get_user_balance(user)
@@ -213,7 +217,7 @@ def get_approve_transfer_page(request: Request, login: str = Form(""), title: st
 
 @app.post("/transfer")
 def add_transfer_(request: Request):
-    transfer_data = request.session.get("transfer_data")
+    transfer_data = request.session.pop("transfer_data")
     user = request.session.get("user")
     from_id = get_user_id_by_email(user["email"])
     to_id = get_user_id_by_login(transfer_data["login"])
