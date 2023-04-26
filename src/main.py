@@ -18,7 +18,7 @@ app.add_middleware(SessionMiddleware, secret_key="test")
 
 
 def comp_less(item1, item2):
-    return item1[3] < item2[3]
+    return item1[3] > item2[3]
 
 
 def make_transfers(t_from: list, t_to: list):
@@ -53,6 +53,23 @@ def get_main_page(request: Request):
         {
             "request": request,
             "transfers": transfers
+        }
+    )
+
+
+@app.get("/all-transfers")
+def get_all_transfers_page(request: Request):
+    user = request.session.get("user")
+    if user is None:
+        return RedirectResponse("/login")
+    user = User.from_dict(user)
+    transfers = make_transfers(get_all_transfers_from(user, all_=True), get_all_transfers_to(user, all_=True))
+    return templates.TemplateResponse(
+        "main.html",
+        {
+            "request": request,
+            "transfers": transfers,
+            "all_": True
         }
     )
 
@@ -108,7 +125,7 @@ def login_user(request: Request, login: str = Form(""), password: str = Form("")
 @app.get("/logout")
 def logout(request: Request):
     request.session.pop("user")
-    return RedirectResponse("/")
+    return RedirectResponse("/login")
 
 
 @app.get("/forgot-password")

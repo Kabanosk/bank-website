@@ -81,16 +81,20 @@ def update_password(email: str, new_password: str):
     postgres_connection.commit()
 
 
-def get_all_transfers_from(user: User):
+def get_all_transfers_from(user: User, all_: bool = False):
     query = 'SELECT login, title, description, date, amount FROM transfer ' \
-            'JOIN "user" u ON to_id = u.id WHERE from_id = %s ORDER BY date DESC'
+            'JOIN "user" u ON to_id = u.id WHERE from_id = %s ORDER BY date'
+    if not all_:
+        query += ' LIMIT 5'
     cursor.execute(query, (get_user_id_by_email(user.email),))
     return cursor.fetchall()
 
 
-def get_all_transfers_to(user: User):
+def get_all_transfers_to(user: User, all_: bool = False):
     query = 'SELECT login, title, description, date, amount FROM transfer ' \
-            'JOIN "user" u ON from_id = u.id WHERE to_id = %s ORDER BY date DESC'
+            'JOIN "user" u ON from_id = u.id WHERE to_id = %s ORDER BY date'
+    if not all_:
+        query += ' LIMIT 5'
     cursor.execute(query, (get_user_id_by_email(user.email),))
     return cursor.fetchall()
 
