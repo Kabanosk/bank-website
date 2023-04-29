@@ -1,7 +1,7 @@
 import random
 
-from model.db import *
-from model.user import User
+from model import User
+from model import Transfer
 from src.validation import valid_email, valid_password
 
 from argon2 import PasswordHasher
@@ -46,8 +46,10 @@ def get_main_page(request: Request):
     user = request.session.get("user")
     if user is None:
         return RedirectResponse("/login")
+
     user = User.from_dict(user)
-    transfers = make_transfers(get_all_transfers_from(user), get_all_transfers_to(user))
+    transfers = make_transfers(Transfer.all_from(user), Transfer.all_to(user))
+
     return templates.TemplateResponse(
         "main.html",
         {
@@ -63,7 +65,7 @@ def get_all_transfers_page(request: Request):
     if user is None:
         return RedirectResponse("/login")
     user = User.from_dict(user)
-    transfers = make_transfers(get_all_transfers_from(user, all_=True), get_all_transfers_to(user, all_=True))
+    transfers = make_transfers(Transfer.all_from(user, all_=True), Transfer.all_to(user, all_=True))
     return templates.TemplateResponse(
         "main.html",
         {
@@ -81,17 +83,19 @@ def get_register_page(request: Request):
 
 @app.post("/register")
 def register_user(request: Request, login: str = Form(""), email: str = Form(""), password: str = Form("")):
-    new_user = User(login, email, password)
+    new_user = User.get(login=login)
 
     if not valid_email(email):
         return {"message": "Email not valid."}
     if not valid_password(password):
         return {"message": "Password not valid."}
 
-    if user_exists(new_user):
+    if new_user is not None:
         return {"message": "User exists."}
 
-    add_user_to_database(new_user)
+    new_user = User(-1, login, email, password, 0)
+    new_user.add_to_db()
+    new_user = User.get(login=new_user.login)
     request.session["user"] = new_user.to_dict()
     return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
 
@@ -103,20 +107,17 @@ def get_login_page(request: Request):
 
 @app.post("/login")
 def login_user(request: Request, login: str = Form(""), password: str = Form("")):
-    user_data = get_user(login)
-    if not user_data:
+    user = User.get(login=login)
+    if not user:
         return {"message": "User not found."}
-    user = User(*user_data)
 
     ph = PasswordHasher()
     h_pass = user.password
+
     try:
         ph.verify(h_pass, password)
     except VerifyMismatchError:
         return {"message": "Bad password"}
-
-    if not user_exists(user):
-        return {"message": "User doesn't exist."}
 
     request.session["user"] = user.to_dict()
     return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
@@ -138,10 +139,9 @@ def forgot_password(request: Request, email: str = Form("")):
     if not valid_email(email):
         return {"message": "Email not valid."}
     try:
-        u_id = get_user_id_by_email(email)
-        if not u_id:
+        user = User.get(email=email)
+        if not user:
             raise HTTPException(status_code=404, detail="User not found")
-        user = User(*get_user_data_by_id(u_id))
 
         reset_token = "".join([str(random.randint(0, 9)) for _ in range(10)])
         request.session["token"] = reset_token
@@ -185,10 +185,8 @@ def update_password_(request: Request, new_password: str = Form("")):
     email = request.session.pop("email")
     if not valid_password(new_password):
         return {"message": "Password not valid."}
-    update_password(email, new_password)
-
-    u_id = get_user_id_by_email(email)
-    user = User(*get_user_data_by_id(u_id))
+    user = User.get(email=email)
+    user.update_password(new_password)
     request.session["user"] = user.to_dict()
     return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
 
@@ -217,10 +215,9 @@ def get_approve_transfer_page(
         return {"message": "Transaction amount must be positive"}
 
     user = User.from_dict(request.session.get("user"))
-    user_balance = get_user_balance(user)
-    if user_balance < amount:
+    if user.balance < amount:
         return {"message": "Not enough many in your balance."}
-    if not user_exists(user):
+    if not user.exists():
         return {"message": "User doesn't exist."}
 
     request.session["transfer_data"] = transfer_data
@@ -239,19 +236,18 @@ def get_approve_transfer_page(
 def add_transfer_(request: Request):
     transfer_data = request.session.pop("transfer_data")
     user = request.session.get("user")
-    from_id = get_user_id_by_email(user["email"])
-    to_id = get_user_id_by_login(transfer_data["login"])
     title = transfer_data["title"]
     desc = transfer_data["description"]
     amount = transfer_data["amount"]
 
-    user2 = get_user_data_by_id(to_id)
     user = User.from_dict(user)
-    if not user2:
+    user2 = User.get(login=transfer_data["login"])
+    if not user2.exists():
         return {"message": "User doesn't exist."}
-    to_user = User(user2[0], user2[1], user2[2])
 
-    add_transfer(from_id, to_id, title, desc, amount)
-    update_user_balance(user, -amount)
-    update_user_balance(to_user, amount)
+    transfer = Transfer(user.id_, user2.id_, title, desc, amount)
+    transfer.add_to_db()
+
+    user.update_balance(-amount)
+    user2.update_balance(amount)
     return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
