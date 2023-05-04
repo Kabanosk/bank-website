@@ -1,4 +1,4 @@
-from model import User
+from src.models import User
 from src.validation import valid_email, valid_password
 
 import random

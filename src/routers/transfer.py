@@ -1,5 +1,5 @@
-from model import User
-from model import Transfer
+from src.models import User
+from src.models import Transfer
 
 from fastapi import APIRouter, Request, Form, status
 from fastapi.responses import RedirectResponse

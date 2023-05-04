@@ -1,6 +1,6 @@
-from src.endpoints.main import router as main_page_router
-from src.endpoints.login import router as login_router
-from src.endpoints.transfer import router as transfer_router
+from src.routers.main import router as main_page_router
+from src.routers.login import router as login_router
+from src.routers.transfer import router as transfer_router
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
