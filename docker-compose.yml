@@ -7,7 +7,7 @@ services:
     volumes:
       - .:/app
     ports:
-      - "8008:8000"
+      - "8000:8000"
     environment:
       - DATABASE_URL=postgresql://postgres:test@db:5432/bank_website
     depends_on:
