@@ -1,34 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Strona główna</title>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Strona główna</title>
+
+	<!-- <link rel="stylesheet" href="/static/css/style.css"> -->
 </head>
 <body>
-<a href="/transfer">Make transfer</a><br>
-<a href="/logout">Logout</a><br><br>
-{% for transfer in transfers: %}
-<div class="transfer">
-    {% if transfer[5]: %}
-        To:
-    {% else: %}
-        From:
-    {% endif %}
-    <b>{{transfer[0]}}</b><br>
-    <b>{{transfer[1]}}</b><br>
-    {{transfer[2]}}<br>
-    {{transfer[3]}}
-    {% if transfer[5]: %}
-        <span style="color: red">{{transfer[4]}}</span>
-    {% else: %}
-        <span style="color: green">{{transfer[4]}}</span>
-    {% endif %}
-    <br>
-</div><br>
-{% endfor %}
+	<div class="container">
+		<i class="size3" style="--clr:#00ff0a;"></i>
+		<i class="size3" style="--clr:#ff0057;"></i>
+		<i class="size3" style="--clr:#fffc44;"></i>
 
-{% if not all_: %}
-    <a href="/all-transfers">See all transfers</a>
-{% endif %}
+		<a href="/transfer">Make transfer</a><br>
+		<a href="/logout">Logout</a><br><br>
+
+		{% for transfer in transfers: %}
+		<div class="transfer">
+			<p>
+				{% if transfer[5]: %}
+					To:
+				{% else: %}
+					From:
+				{% endif %}
+
+				<b>{{transfer[0]}}</b>
+			</p>
+			<p><b>{{transfer[1]}}</b></p>
+
+			<p>{{transfer[2]}}</p>
+			<p>{{transfer[3]}}</p>
+			<p>
+				{% if transfer[5]: %}
+				<span style="color: red">{{transfer[4]}}</span>
+				{% else: %}
+				<span style="color: green">{{transfer[4]}}</span>
+				{% endif %}
+			</p>
+		</div>
+		{% endfor %}
+	</div>
+  {% if not all_: %}
+      <a href="/all-transfers">See all transfers</a>
+  {% endif %}
 </body>
 </html>

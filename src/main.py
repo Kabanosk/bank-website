@@ -8,15 +8,16 @@ from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from fastapi import FastAPI, Request, HTTPException, Form, status
 from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 import smtplib
-
 
 import uvicorn
 
 app = FastAPI()
 templates = Jinja2Templates(directory="src/templates")
+app.mount("/static/", StaticFiles(directory="static"), name="static")
 app.add_middleware(SessionMiddleware, secret_key="test")
 
 
@@ -25,23 +26,23 @@ def comp_less(item1, item2):
 
 
 def make_transfers(t_from: list, t_to: list):
-    i, j = 0, 0
-    n, m = len(t_from), len(t_to)
-    res = []
-    while i < n and j < m:
-        if comp_less(t_from[i], t_to[j]):
-            res.append(t_from[i] + (1, ))
-            i += 1
-        else:
-            res.append(t_to[j] + (0, ))
-            j += 1
-    if i != n:
-        for x in t_from[i:]:
-            res.append(x + (1, ))
-    if j != m:
-        for x in t_to[j:]:
-            res.append(x + (0, ))
-    return res
+	i, j = 0, 0
+	n, m = len(t_from), len(t_to)
+	res = []
+	while i < n and j < m:
+		if comp_less(t_from[i], t_to[j]):
+			res.append(t_from[i] + (1, ))
+			i += 1
+		else:
+			res.append(t_to[j] + (0, ))
+			j += 1
+	if i != n:
+		for x in t_from[i:]:
+			res.append(x + (1, ))
+	if j != m:
+		for x in t_to[j:]:
+			res.append(x + (0, ))
+	return res
 
 
 @app.get("/")
@@ -81,17 +82,17 @@ def get_all_transfers_page(request: Request):
 
 @app.get("/register")
 def get_register_page(request: Request):
-    return templates.TemplateResponse("register.html", {"request": request})
+	return templates.TemplateResponse("register.html", {"request": request})
 
 
 @app.post("/register")
 def register_user(request: Request, login: str = Form(""), email: str = Form(""), password: str = Form("")):
     new_user = User.get(login=login)
 
-    if not valid_email(email):
-        return {"message": "Email not valid."}
-    if not valid_password(password):
-        return {"message": "Password not valid."}
+	if not valid_email(email):
+		return {"message": "Email not valid."}
+	if not valid_password(password):
+		return {"message": "Password not valid."}
 
     if new_user is not None:
         return {"message": "User exists."}
@@ -105,7 +106,7 @@ def register_user(request: Request, login: str = Form(""), email: str = Form("")
 
 @app.get("/login")
 def get_login_page(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+	return templates.TemplateResponse("login.html", {"request": request})
 
 
 @app.post("/login")
@@ -196,7 +197,7 @@ def update_password_(request: Request, new_password: str = Form("")):
 
 @app.get("/transfer")
 def get_transfer_page(request: Request):
-    return templates.TemplateResponse("transfer.html", {"request": request})
+	return templates.TemplateResponse("transfer.html", {"request": request})
 
 
 @app.post("/approve-transfer")

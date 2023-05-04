@@ -1,26 +1,40 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Register</title>
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<!-- user-scalable=no, maximum-scale=1.0, minimum-scale=1.0 -->
+		<title>Register</title>
+
+	<link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-<form method="post" action="/register">
-    <label>Login:
-        <input type="text" name="login">
-    </label><br>
-    <label>Email:
-        <input type="text" name="email">
-    </label><br>
-    <label>Password:
-        <input type="password" name="password">
-    </label><br>
-    <input type="submit">
-</form>
-<a href="/login">Login</a>
+	<div class="container">
+		<!-- TODO: zrobic kolory jako elementy tablicy, ktore w zalezności od stałej są inne -->
 
+		<i class="size2" style="--clr:#00ff0a;"></i>
+		<i class="size2" style="--clr:#ff0057;"></i>
+		<i class="size2" style="--clr:#fffc44;"></i>
+
+		<form method="post" class="login" action="/register">
+			<h2>Sign Up</h2>
+			<div class="inputBx">
+				<input type="text" placeholder="Login" name="login">
+			</div>
+			<div class="inputBx">
+				<input type="text" placeholder="Email" name="email">
+			</div>
+			<div class="inputBx">
+				<input type="password" placeholder="Password" name="password">
+			</div>
+			<div class="inputBx">
+			    <input type="submit">
+			</div>
+
+			<div class="links single">
+				<a href="/login">Sign In</a>
+		</form>
+	</div>
 </body>
 </html>

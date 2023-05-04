@@ -1,16 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Approve transfer</title>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Approve transfer</title>
+
+	<link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-Account: {{login}}<br>
-{{title}}<br>
-{{description}}<br>
-Amount: {{amount}}
-<form method="post" action="/transfer">
-    <input type="submit">
-</form>
+	<div class="container">
+		<i class="size2" style="--clr:#00ff0a;"></i>
+		<i class="size2" style="--clr:#ff0057;"></i>
+		<i class="size2" style="--clr:#fffc44;"></i>
+
+		<form method="post" class="login" action="/transfer">
+			<!-- TODO: zrobic ladne bloczki -->
+			<div class="inputBx">
+				<p>Account: {{login}}<br></p>
+			</div>
+
+			<div class="inputBx">
+				<p>{{title}}<br></p>
+			</div>
+
+			<div class="inputBx">
+				<p>{{description}}<br></p>
+			</div>
+
+			<div class="inputBx">
+				<p>Amount: {{amount}}</p>
+			</div>
+
+			<div class="inputBx">
+				<input type="submit" value="Submit">
+			</div>
+		</form>
+	</div>
 </body>
 </html>
