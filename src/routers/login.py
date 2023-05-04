@@ -87,8 +87,8 @@ def forgot_password(request: Request, email: str = Form("")):
 
         smtp_server = "smtp.gmail.com"
         smtp_port = 465
-        smtp_username = "bank.moj.ulubiony@gmail.com"
-        smtp_password = "mgcuexptvlwoczdk"
+        smtp_username = "moj.bank.ulubiony@gmail.com"
+        smtp_password = "eifcjxhlipggcqua"
 
         body = f"Subject: Password Reset Request\n\n" \
                f"Hi {user.login},\n\n" \
