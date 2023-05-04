@@ -2,7 +2,8 @@ import psycopg2
 
 
 def connect(dbname: str, user: str, password: str):
-    return psycopg2.connect(f"dbname={dbname} user={user} password='{password}'")
+    DATABASE_URL = f"postgresql://{user}:{password}@db:5432/{dbname}"
+    return psycopg2.connect(DATABASE_URL)
 
 
 postgres_connection = connect('bank_website', 'postgres', 'test')
