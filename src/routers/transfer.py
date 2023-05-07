@@ -1,10 +1,9 @@
-from src.models import User
-from src.models import Transfer
-
 from fastapi import APIRouter, Request, Form, status
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
+from src.models import User
+from src.models import Transfer
 
 router = APIRouter()
 templates = Jinja2Templates(directory="src/templates")
@@ -33,7 +32,10 @@ def get_approve_transfer_page(
     if amount <= 0:
         return {"message": "Transaction amount must be positive"}
 
-    user = User.from_dict(request.session.get("user"))
+    user_dict = request.session.get("user")
+    if user_dict is None:
+        return {"message": "User must be logged in."}
+    user = User.from_dict(user_dict)
     if user.balance < amount:
         return {"message": "Not enough many in your balance."}
     if not user.exists():

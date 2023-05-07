@@ -1,6 +1,3 @@
-from src.models import User
-from src.validation import valid_email, valid_password
-
 import random
 
 from argon2 import PasswordHasher
@@ -9,6 +6,9 @@ from fastapi import APIRouter, Request, HTTPException, Form, status
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 import smtplib
+
+from src.models import User
+from src.validation import valid_email, valid_password
 
 router = APIRouter()
 templates = Jinja2Templates(directory="src/templates")

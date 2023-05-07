@@ -1,10 +1,9 @@
-from src.models import User
-from src.models import Transfer
-
 from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
+from src.models import User
+from src.models import Transfer
 
 router = APIRouter()
 templates = Jinja2Templates(directory="src/templates")

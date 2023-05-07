@@ -1,6 +1,6 @@
-from .db import postgres_connection, cursor
-
 from argon2 import PasswordHasher
+
+from .db import postgres_connection, cursor
 
 
 class User:
@@ -28,7 +28,7 @@ class User:
         res = cursor.fetchone()
         if res:
             return User(*res)
-        return None
+        return User(-1, "", "", "", 0)
 
     def exists(self):
         query = 'SELECT * FROM "user" WHERE email = %s AND login = %s'
@@ -67,7 +67,6 @@ class User:
             "id": self.id_,
             "login": self.login,
             "email": self.email,
-            "password": self.password,
             "balance": self.balance
         }
 
