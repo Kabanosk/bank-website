@@ -72,4 +72,4 @@ class User:
 
     @staticmethod
     def from_dict(user: dict):
-        return User(user["id"], user["login"], user['email'], user['password'], user["balance"])
+        return User.get(login=user["login"])

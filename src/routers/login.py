@@ -1,4 +1,5 @@
 import random
+from pprint import pprint
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
@@ -28,7 +29,7 @@ def register_user(request: Request, login: str = Form(""), email: str = Form("")
     if not valid_password(password):
         return {"message": "Password not valid."}
 
-    if new_user is not None:
+    if new_user.exists():
         return {"message": "User exists."}
 
     new_user = User(-1, login, email, password, 0)
