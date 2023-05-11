@@ -6,4 +6,3 @@ To run the website just type:
 ```shell
 docker-compose up --build
 ```
-
