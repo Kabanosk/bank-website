@@ -6,3 +6,5 @@ To run the website just type:
 ```shell
 docker-compose up --build
 ```
+
+Kocham wdb <3
